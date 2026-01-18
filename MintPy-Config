@@ -1,0 +1,349 @@
+# vim: set filetype=cfg:
+##------------------------ smallbaselineApp.cfg ------------------------##
+########## 计算资源配置
+mintpy.compute.maxMemory = auto #[float > 0.0], auto for 4, 要分配的最大内存，单位GB
+## 使用dask进行并行处理
+## 当前应用于步骤：invert_network, correct_topography
+## cluster   = none 关闭并行计算
+## numWorker = all  使用本地所有可用核心（仅适用于 cluster = local）
+## numWorker = 80%  使用本地80%的可用核心（仅适用于 cluster = local）
+## config    = none 回退到默认名称（与集群类型相同；适用于 cluster != local）
+mintpy.compute.cluster   = auto #[local / slurm / pbs / lsf / none], auto for none, 集群类型
+mintpy.compute.numWorker = auto #[int > 1 / all / num%], auto for 4 (local) or 40 (slurm / pbs / lsf), 工作进程数量
+mintpy.compute.config    = auto #[none / slurm / pbs / lsf ], auto for none (same as cluster), 配置名称
+
+
+########## 1. load_data
+##---------手动添加属性
+## MintPy需要 https://mintpy.readthedocs.io/en/latest/api/attributes/ 中列出的属性
+## 缺少的属性可以手动在下面添加（取消注释 #），例如：
+# ORBIT_DIRECTION = ascending
+# PLATFORM = CSK
+# ...
+## a. autoPath - 在 mintpy.defaults.auto_path.AUTO_PATH_* 中定义的自动路径模式
+## b. load_data.py -H 查看更多细节和示例输入
+## c. 压缩以节省 ifgramStack.h5 文件的磁盘使用：
+## no   - 节省   0% 磁盘空间，快 [默认]
+## lzf  - 节省 ~57% 磁盘空间，相对较慢
+## gzip - 节省 ~62% 磁盘空间，非常慢 [不推荐]
+mintpy.load.processor       = auto  #[isce, aria, hyp3, gmtsar, snap, gamma, roipac, nisar], auto for isce
+mintpy.load.autoPath        = auto  #[yes / no], auto for no, 使用预定义的自动路径
+mintpy.load.updateMode      = auto  #[yes / no], auto for yes, 如果HDF5文件完整则跳过重新加载
+mintpy.load.compression     = auto  #[gzip / lzf / none / default], auto for default (none/lzf for stack/geometry).
+##---------仅适用于 ISCE：
+mintpy.load.metaFile        = auto  #[堆栈的公共元数据文件路径], 例如：./reference/IW1.xml, ./referenceShelve/data.dat
+mintpy.load.baselineDir     = auto  #[基线目录路径], 例如：./baselines
+##---------干涉图堆栈：
+mintpy.load.unwFile         = auto  #[解缠干涉图文件路径模式]
+mintpy.load.corFile         = auto  #[空间相干性文件路径模式]
+mintpy.load.connCompFile    = auto  #[连通分量文件路径模式], 可选但推荐
+mintpy.load.intFile         = auto  #[缠绕干涉图文件路径模式], 可选
+mintpy.load.magFile         = auto  #[干涉图幅度文件路径模式], 可选
+##---------电离层堆栈（可选）：
+mintpy.load.ionUnwFile      = auto  #[解缠干涉图文件路径模式]
+mintpy.load.ionCorFile      = auto  #[空间相干性文件路径模式]
+mintpy.load.ionConnCompFile = auto  #[连通分量文件路径模式], 可选但推荐
+##---------偏移堆栈（可选）：
+mintpy.load.azOffFile       = auto  #[方位向偏移文件路径模式]
+mintpy.load.rgOffFile       = auto  #[距离向偏移文件路径模式]
+mintpy.load.azOffStdFile    = auto  #[方位向偏移方差文件路径模式], 可选但推荐
+mintpy.load.rgOffStdFile    = auto  #[距离向偏移方差文件路径模式], 可选但推荐
+mintpy.load.offSnrFile      = auto  #[偏移信噪比文件路径模式], 可选
+##---------几何文件：
+mintpy.load.demFile         = auto  #[DEM文件路径]
+mintpy.load.lookupYFile     = auto  #[纬度/行/y坐标文件路径], 地理编码数据不需要
+mintpy.load.lookupXFile     = auto  #[经度/列/x坐标文件路径], 地理编码数据不需要
+mintpy.load.incAngleFile    = auto  #[入射角文件路径], 可选但推荐
+mintpy.load.azAngleFile     = auto  #[方位角文件路径], 可选
+mintpy.load.shadowMaskFile  = auto  #[阴影掩膜文件路径], 可选但推荐
+mintpy.load.waterMaskFile   = auto  #[水域掩膜文件路径], 可选但推荐
+mintpy.load.bperpFile       = auto  #[2D垂直基线文件路径模式], 可选
+##---------子集（可选）：
+## 如果同时指定了yx和lalo，使用lalo选项，除非 a) 没有查找表文件 AND b) 数据集在雷达坐标中
+mintpy.subset.yx            = auto    #[y0:y1,x0:x1 / no], auto for no
+mintpy.subset.lalo          = auto    #[S:N,W:E / no], auto for no
+##---------多视（可选）：
+## 使用指定方法加载数据时进行多视，以减少数据集大小
+## 方法 - 最近邻、平均和中值方法适用于干涉图/电离层/偏移堆栈，除了：
+##   连通分量和所有几何数据集，这些数据集硬编码使用最近邻方法。
+## 谨慎使用平均/中值方法！它可能平滑噪声以获得更好的SNR，但也可能平滑解缠误差，
+##   破坏了用于解缠误差校正的整数2π关系。
+##   如果您真的想提高SNR，请考虑使用更多视数重新生成干涉图堆栈。
+mintpy.multilook.method     = auto    #[nearest, mean, median], auto for nearest - 行/列跳点方法
+mintpy.multilook.ystep      = auto    #[int >= 1], auto for 1 - 不多视
+mintpy.multilook.xstep      = auto    #[int >= 1], auto for 1 - 不多视
+
+
+########## 2. modify_network
+## 1) 基于时间/垂直基线、日期、连接数等的网络修改
+mintpy.network.tempBaseMax     = auto  #[1-inf, no], auto for no, 最大时间基线，单位天
+mintpy.network.perpBaseMax     = auto  #[1-inf, no], auto for no, 最大垂直空间基线，单位米
+mintpy.network.connNumMax      = auto  #[1-inf, no], auto for no, 每个采集的最大邻居数
+mintpy.network.startDate       = auto  #[20090101 / no], auto for no
+mintpy.network.endDate         = auto  #[20110101 / no], auto for no
+mintpy.network.excludeDate     = auto  #[20080520,20090817 / no], auto for no
+mintpy.network.excludeDate12   = auto  #[20080520_20090817 / no], auto for no
+mintpy.network.excludeIfgIndex = auto  #[1:5,25 / no], auto for no, 干涉图索引列表（从0开始）
+mintpy.network.referenceFile   = auto  #[date12_list.txt / ifgramStack.h5 / no], auto for no
+
+## 2) 数据驱动的网络修改
+## a - 基于相干性的网络修改 = 默认（阈值 + MST）
+## 参考文献：Yunjun et al. (2019, section 4.2 and 5.3.1); Chaussard et al. (2015, GRL)
+## 它使用基于输入掩膜（含AOI）的空间相干性计算每个干涉图的平均相干性
+## 然后它以平均相干性的倒数为权重找到最小生成树（MST）网络（keepMinSpanTree）
+## 接着排除干涉图，如果 a) 平均相干性 < minCoherence AND b) 不在MST网络中。
+mintpy.network.coherenceBased  = auto  #[yes / no], auto for no, 排除相干性 < minCoherence 的干涉图
+mintpy.network.minCoherence    = auto  #[0.0-1.0], auto for 0.7
+
+## b - 有效相干比网络修改 = 默认（阈值 + MST）
+## 参考文献：Kang et al. (2021, RSE)
+## 它计算每个干涉图中高于空间相干性阈值的面积比。
+## 该阈值定义为输入掩膜内干涉图的空间相干性。
+## 然后它以面积比的倒数为权重找到最小生成树（MST）网络（keepMinSpanTree）
+## 接着排除干涉图，如果 a) 面积比 < minAreaRatio AND b) 不在MST网络中。
+mintpy.network.areaRatioBased  = auto  #[yes / no], auto for no, 排除面积比 < minAreaRatio 的干涉图
+mintpy.network.minAreaRatio    = auto  #[0.0-1.0], auto for 0.75
+
+## 2) 数据驱动的网络修改的附加公共参数
+mintpy.network.keepMinSpanTree = auto  #[yes / no], auto for yes, 保留最小生成树网络中的干涉图
+mintpy.network.maskFile        = auto  #[文件名, no], auto for waterMask.h5 or no [如果未找到 waterMask.h5]
+mintpy.network.aoiYX           = auto  #[y0:y1,x0:x1 / no], auto for no, 用于相干性计算的感兴趣区域
+mintpy.network.aoiLALO         = auto  #[S:N,W:E / no], auto for no - 使用整个区域
+
+
+########## 3. reference_point
+## 将所有干涉图参考到空间中的一个公共点
+## auto - 随机选择相干性 > minCoherence 的像素
+## 但是，强烈建议使用研究区域的先验知识手动指定
+##   遵循以下指南（Yunjun et al., 2019, section 4.3）：
+## 1) 位于相干区域，以最小化失相关影响。
+## 2) 不受强烈大气湍流影响，即电离层条纹
+## 3) 靠近AOI且海拔相似，以最小化空间相关大气延迟的影响
+mintpy.reference.yx            = auto   #[257,151 / auto]
+mintpy.reference.lalo          = auto   #[31.8,130.8 / auto]
+mintpy.reference.maskFile      = auto   #[filename / no], auto for maskConnComp.h5
+mintpy.reference.coherenceFile = auto   #[filename], auto for avgSpatialCoh.h5
+mintpy.reference.minCoherence  = auto   #[0.0-1.0], auto for 0.85, 自动方法的最小相干性
+
+
+########## quick_overview
+## 快速评估：
+## 1) 可能的地面形变
+##    使用传统干涉图叠加的速度
+##    参考文献：Zebker et al. (1997, JGR)
+## 2) 相位解缠误差的分布
+##    来自具有非零闭合相位整数模糊度的干涉图三元组数量
+##    参考文献：Yunjun et al. (2019, CAGEO)中的T_int。相关于section 3.2, equation (8-9) 和 Fig. 3d-e.
+
+
+########## 4. correct_unwrap_error (可选)
+## 此步骤需要连通分量（mintpy.load.connCompFile）。
+## 据我们所知，SNAPHU（Chen & Zebker,2001）是目前唯一提供连通分量的解缠器。
+## 参考文献：Yunjun et al. (2019, section 3)
+## 支持的方法：
+## a. phase_closure          - 适用于高度冗余的网络
+## b. bridging               - 适用于被狭窄失相关特征（如河流、狭窄水体）分隔的区域
+## c. bridging+phase_closure - 在桥接后剩余少量误差时推荐
+mintpy.unwrapError.method          = auto  #[bridging / phase_closure / bridging+phase_closure / no], auto for no
+mintpy.unwrapError.waterMaskFile   = auto  #[waterMask.h5 / no], auto for waterMask.h5 or no [如果未找到]
+mintpy.unwrapError.connCompMinArea = auto  #[1-inf], auto for 2.5e3, 丢弃小于最小尺寸（像素）的区域
+
+## phase_closure 选项：
+## numSample - 实施了基于区域的策略以加速L1范数正则化最小二乘反演。
+##     不是为每个像素反演整数模糊度，而是生成一个公共连通分量掩膜，
+##     对于每个公共连通分量，随机选择numSample个像素进行反演，并使用结果的中值
+##     作为该公共连通分量内所有像素的值。
+mintpy.unwrapError.numSample       = auto  #[int>1], auto for 100, 公共连通分量的反演样本数
+
+## bridging 选项：
+## ramp - 可以基于最大的可靠区域估计相位斜坡，在估计可靠区域之间的相位差之前从整个干涉图中移除，
+##     在校正后加回。
+## bridgePtsRadius - 用于计算相位差中值的窗口的一半大小
+mintpy.unwrapError.ramp            = auto  #[linear / quadratic], auto for no; 推荐L波段数据使用linear
+mintpy.unwrapError.bridgePtsRadius = auto  #[1-inf], auto for 50, 端点周围窗口的一半大小
+
+
+########## 5. invert_network
+## 使用加权最小二乘（WLS）估计器将干涉图网络反演为时间序列。
+## 最小二乘反演的加权选项 [有快速选项但不是最佳]：
+## a. var - 使用协方差逆作为权重（Tough et al., 1995; Guarnieri & Tebaldini, 2008）[推荐]
+## b. fim - 使用Fisher信息矩阵作为权重（Seymour & Cumming, 1994; Samiei-Esfahany et al., 2016）。
+## c. coh - 使用相干性作为权重（Perissin & Wang, 2012）
+## d. no  - 均匀权重（Berardino et al., 2002）[快速]
+## SBAS（Berardino et al., 2002）= minNormVelocity（yes）+ weightFunc（no）
+mintpy.networkInversion.weightFunc      = auto #[var / fim / coh / no], auto for var
+mintpy.networkInversion.waterMaskFile   = auto #[filename / no], auto for waterMask.h5 or no [如果未找到]
+mintpy.networkInversion.minNormVelocity = auto #[yes / no], auto for yes, 最小范数形变速度/相位
+
+## 反演前每个干涉图的unwrapPhase的掩膜选项（如果weightFunct=no则推荐）：
+## a. coherence              - 掩膜空间相干性 < maskThreshold 的像素
+## b. connectComponent       - 掩膜值为False/0的像素
+## c. no                     - 不掩膜 [推荐]
+## d. range/azimuthOffsetStd - 掩膜偏移标准差 > maskThreshold 的像素 [用于偏移]
+mintpy.networkInversion.maskDataset   = auto #[coherence / connectComponent / rangeOffsetStd / azimuthOffsetStd / no], auto for no
+mintpy.networkInversion.maskThreshold = auto #[0-inf], auto for 0.4
+mintpy.networkInversion.minRedundancy = auto #[1-inf], auto for 1.0, 每个SAR采集的最小冗余度（干涉图数量）
+
+## 计算时间相干性并用作可靠性度量以生成掩膜
+## 参考文献：Pepe & Lanari (2006, IEEE-TGRS)
+mintpy.networkInversion.minTempCoh  = auto #[0.0-1.0], auto for 0.7, 掩膜的最小时间相干性
+mintpy.networkInversion.minNumPixel = auto #[int > 1], auto for 100, 掩膜中所需的最小像素数
+mintpy.networkInversion.shadowMask  = auto #[yes / no], auto for yes [如果shadowMask在几何文件中] or no.
+
+
+########## correct_LOD
+## 局部振荡器漂移（LOD）校正（仅适用于Envisat）
+## 参考文献：Marinkovic and Larsen (2013, Proc. LPS)
+## 自动应用于Envisat数据（通过PLATFORM属性识别）
+## 并跳过所有其他卫星。
+
+
+########## 6. correct_SET
+## 固体地球潮汐（SET）校正 [需要安装insarlab/PySolid]
+## 参考文献：Milbert (2018); Yunjun et al. (2022, IEEE-TGRS)
+mintpy.solidEarthTides = auto #[yes / no], auto for no
+
+
+########## 7. correct_ionosphere (可选但推荐)
+## 校正电离层延迟 [需要来自ISCE-2堆栈处理器的分裂频谱结果]
+## 参考文献：
+##   ISCE-2 topsApp/topsStack: Liang et al. (2019, IEEE-TGRS)
+##   ISCE-2 stripmapApp/stripmapStack: Fattahi et al. (2017, IEEE-TGRS)
+##   ISCE-2 alos2App/alosStack: Liang et al. (2018, IEEE-TGRS)
+mintpy.ionosphericDelay.method        = auto  #[split_spectrum / no], auto for no
+mintpy.ionosphericDelay.excludeDate   = auto  #[20080520,20090817 / no], auto for no
+mintpy.ionosphericDelay.excludeDate12 = auto  #[20080520_20090817 / no], auto for no
+
+
+########## 8. correct_troposphere (可选但推荐)
+## 使用以下方法校正对流层延迟：
+## a. height_correlation - 校正分层对流层延迟（Doin et al., 2009, J Applied Geop）
+## b. pyaps - 使用全球大气模型（GAMs）数据（Jolivet et al., 2011; 2014）
+##      ERA5  - 来自ECMWF的ERA5 [需要从GitHub安装PyAPS；推荐且默认开启]
+##      MERRA - 来自NASA的MERRA-2 [需要从Caltech/EarthDef安装PyAPS]
+##      NARR  - 来自NOAA的NARR [需要从Caltech/EarthDef安装PyAPS；推荐用于北美]
+## c. gacos - 使用具有迭代对流层分解模型的GACOS（Yu et al., 2018, JGR）
+##      需要在此步骤运行前手动从 http://www.gacos.net 下载所有采集的GACOS产品
+mintpy.troposphericDelay.method = auto  #[pyaps / height_correlation / gacos / no], auto for pyaps
+
+## pyaps的注意事项：
+## a. GAM数据延迟：对于最新的SAR数据，可能会有GAM数据缺失，校正将应用于有GAM数据可用的日期，并跳过其他日期。
+## b. WEATHER_DIR：如果您定义一个名为WEATHER_DIR的环境变量，其中包含目录路径，
+##    那么MintPy应用程序将把GAM文件下载到该目录中。
+##    MintPy应用程序将在下载新文件之前先在该目录中查找GAM文件，
+##    以防止如果您处理覆盖相同日期/时间的不同数据集时下载多个副本。
+mintpy.troposphericDelay.weatherModel = auto  #[ERA5 / MERRA / NARR], auto for ERA5
+mintpy.troposphericDelay.weatherDir   = auto  #[path2directory], auto for WEATHER_DIR or "./"
+
+## height_correlation的注意事项：
+## 仅应用额外的多视来估计经验相位/高程比。
+## 对于一个具有5 by 15视数的数据集，looks=8将生成具有（5*8）by（15*8）视数的相位
+## 来估计经验参数；然后将校正应用于原始相位（具有5 by 15视数），
+## 如果相位/高程相关性大于minCorrelation。
+mintpy.troposphericDelay.polyOrder      = auto  #[1 / 2 / 3], auto for 1
+mintpy.troposphericDelay.looks          = auto  #[1-inf], auto for 8, 额外多视数
+mintpy.troposphericDelay.minCorrelation = auto  #[0.0-1.0], auto for 0
+
+## gacos的注意事项：
+## 将以下路径设置为包含下载的*.ztd*文件的目录
+mintpy.troposphericDelay.gacosDir = auto # [path2directory], auto for "./GACOS"
+
+
+########## 9. deramp (可选)
+## 基于可靠像素估计并移除每个采集的相位斜坡。
+## 推荐用于局部形变信号，即火山形变、滑坡和地面沉降等。
+## 不推荐用于长空间波长形变信号，即同震、震后和震间形变。
+mintpy.deramp          = auto  #[no / linear / quadratic], auto for no - 不移除斜坡
+mintpy.deramp.maskFile = auto  #[filename / no], auto for maskTempCoh.h5, 用于斜坡估计的掩膜文件
+
+
+########## 10. correct_topography (可选但推荐)
+## 地形残差（DEM误差）校正
+## 参考文献：Fattahi and Amelung (2013, IEEE-TGRS)
+## stepDate          - 如果您知道研究区域存在突然的位移跳跃，请指定stepDate选项，
+##                     例如火山喷发或地震
+## excludeDate       - 误差估计中排除的日期
+## pixelwiseGeometry - 使用逐像素几何（入射角和斜距距离）
+##                     yes - 如果可用则使用逐像素几何 [慢；默认使用]
+##                     no  - 使用平均几何 [快]
+mintpy.topographicResidual                   = auto  #[yes / no], auto for yes
+mintpy.topographicResidual.polyOrder         = auto  #[1-inf], auto for 2, 时间形变模型的多项式阶数
+mintpy.topographicResidual.phaseVelocity     = auto  #[yes / no], auto for no - 最小化使用相位速度
+mintpy.topographicResidual.stepDate          = auto  #[20080529,20190704T1733 / no], auto for no, 跳跃发生日期
+mintpy.topographicResidual.excludeDate       = auto  #[20070321 / txtFile / no], auto for exclude_date.txt
+mintpy.topographicResidual.pixelwiseGeometry = auto  #[yes / no], auto for yes, 使用逐像素几何信息
+
+
+########## 11.1 residual_RMS (用于噪声评估的均方根)
+## 计算每个采集的残差相位时间序列的均方根（RMS）
+## 参考文献：Yunjun et al. (2019, section 4.9 and 5.4)
+## 为消除长空间波长分量，为每个采集移除了一个斜坡
+## 将最佳参考日期设置为RMS最小的日期
+## 将排除日期（异常值）设置为RMS > cutoff * 中值RMS（中值绝对偏差）的日期
+mintpy.residualRMS.maskFile = auto  #[file name / no], auto for maskTempCoh.h5, 用于斜坡估计的掩膜
+mintpy.residualRMS.deramp   = auto  #[quadratic / linear / no], auto for quadratic
+mintpy.residualRMS.cutoff   = auto  #[0.0-inf], auto for 3
+
+########## 11.2 reference_date
+## 将所有时间序列参考到一个时间点
+## 参考文献：Yunjun et al. (2019, section 4.9)
+## no     - 不更改默认参考日期（第一个日期）
+mintpy.reference.date = auto   #[reference_date.txt / 20090214 / no], auto for reference_date.txt
+
+
+########## 12. velocity
+## 估计一套时间函数 [默认为线性速度]
+## 从最终位移文件（如果存在对流层延迟文件，也从该文件）
+mintpy.timeFunc.startDate   = auto   #[20070101 / no], auto for no
+mintpy.timeFunc.endDate     = auto   #[20101230 / no], auto for no
+mintpy.timeFunc.excludeDate = auto   #[exclude_date.txt / 20080520,20090817 / no], auto for exclude_date.txt
+
+## 拟合一套时间函数
+## 参考文献：Hetland et al. (2012, JGR) 方程 (2-9)
+## 多项式函数    由其整数阶数定义。1表示线性，2表示二次，等等。
+## 周期性函数   由以十进制年表示的周期列表定义。1表示年周期，0.5表示半年周期，等等。
+## 阶跃函数   由以YYYYMMDD(THHMM)格式表示的发作时间列表定义。
+## 指数和对数函数由发作时间后跟以整数天表示的特征时间定义。
+##   多个指数和对数函数可以相互叠加，通过例如：
+##   20110311,60,120          - 两个函数共享相同的发作时间 OR
+##   20110311,60;20170908,120 - 用 ";" 分隔
+mintpy.timeFunc.polynomial = auto   #[int >= 0], auto for 1, 多项式函数的阶数
+mintpy.timeFunc.periodic   = auto   #[1,0.5 / list_of_float / no], auto for no, 以十进制年表示的周期
+mintpy.timeFunc.stepDate   = auto   #[20110311,20170908 / 20120928T1733 / no], auto for no, 阶跃函数
+mintpy.timeFunc.exp        = auto   #[20110311,60 / 20110311,60,120 / 20110311,60;20170908,120 / no], auto for no
+mintpy.timeFunc.log        = auto   #[20110311,60 / 20110311,60,120 / 20110311,60;20170908,120 / no], auto for no
+
+## 不确定性量化方法：
+## a. residue    - 假设时间上正态分布，从拟合残差传播（Fattahi & Amelung, 2015, JGR）
+## b. covariance - 从时间序列（协）方差矩阵传播
+## c. bootstrap  - 自助法（独立地有放回重采样；Efron & Tibshirani, 1986, Stat. Sci.）
+mintpy.timeFunc.uncertaintyQuantification = auto   #[residue, covariance, bootstrap], auto for residue
+mintpy.timeFunc.timeSeriesCovFile         = auto   #[filename / no], auto for no, 时间序列协方差文件
+mintpy.timeFunc.bootstrapCount            = auto   #[int>1], auto for 400, 自助法的迭代次数
+
+
+########## 13.1 geocode (后处理)
+# 仅适用于雷达坐标系中的输入数据集
+# 常用的米制分辨率以及赤道上的度制分辨率
+# 100,         90,          60,          50,          40,          30,          20,          10
+# 0.000925926, 0.000833334, 0.000555556, 0.000462963, 0.000370370, 0.000277778, 0.000185185, 0.000092593
+mintpy.geocode              = auto  #[yes / no], auto for yes
+mintpy.geocode.SNWE         = auto  #[-1.2,0.5,-92,-91 / none ], auto for none, 输出范围（度）
+mintpy.geocode.laloStep     = auto  #[-0.000555556,0.000555556 / None], auto for None, 输出分辨率（度）
+mintpy.geocode.interpMethod = auto  #[nearest], auto for nearest, 插值方法
+mintpy.geocode.fillValue    = auto  #[np.nan, 0, ...], auto for np.nan, 异常值的填充值。
+
+########## 13.2 google_earth (后处理)
+mintpy.save.kmz             = auto   #[yes / no], auto for yes, 将地理编码的速度保存到Google Earth KMZ文件
+
+########## 13.3 hdfeos5 (后处理)
+mintpy.save.hdfEos5         = auto   #[yes / no], auto for no, 将时间序列保存为HDF-EOS5格式
+mintpy.save.hdfEos5.update  = auto   #[yes / no], auto for no, 在输出文件名中将结束日期设为XXXXXXXX
+mintpy.save.hdfEos5.subset  = auto   #[yes / no], auto for no, 在输出文件名中包含子集范围信息
+
+########## 13.4 plot
+# 对于高分辨率绘图，增加 mintpy.plot.maxMemory
+# 对于通过更多并行化快速绘图，减少 mintpy.plot.maxMemory
+mintpy.plot           = auto  #[yes / no], auto for yes, 将默认处理生成的文件绘图到pic文件夹
+mintpy.plot.dpi       = auto  #[int], auto for 150, 每英寸点数（DPI）
+mintpy.plot.maxMemory = auto  #[float], auto for 4, view.py一次调用用于绘图的最大内存。
