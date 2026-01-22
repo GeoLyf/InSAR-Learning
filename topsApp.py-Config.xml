@@ -1,0 +1,406 @@
+<!--##############################################直接可用的.xml文件模板，使用时将参数按实际情况替换即可##############################################-->
+<?xml version="1.0" encoding="UTF-8"?>
+<topsApp>
+  <component name="topsinsar">
+    <property name="Sensor name">SENTINEL1</property>
+    <component name="reference">
+      <property name="orbit directory">/home/liyifu/D-InSAR_Binzhou/Orbits</property>
+      <property name="output directory">master</property>
+      <property name="safe">/home/liyifu/D-InSAR_Binzhou/SLC/S1A_IW_SLC__1SDV_20241217T104538_20241217T104605_057031_07022C_A5D7.zip</property>
+    </component>
+    <component name="secondary">
+      <property name="orbit directory">/home/liyifu/D-InSAR_Binzhou/Orbits</property>
+      <property name="output directory">slave</property>
+      <property name="safe">/home/liyifu/D-InSAR_Binzhou/SLC/S1A_IW_SLC__1SDV_20241229T104538_20241229T104605_057206_07091B_DAEF.zip</property>
+    </component>
+    <property name="demFilename">/home/liyifu/D-InSAR_Binzhou/DEM/demLat_N34_N36_Lon_E107_E109.dem.wgs84</property>
+    <property name="range looks">2</property>
+    <property name="azimuth looks">10</property>
+    <property name="swaths">[1,2]</property>
+    <property name="region of interest">[34.84, 35.29, 107.80, 108.37]</property>
+    <property name="do ESD">True</property>
+    <property name="filter strength">0.5</property>
+    <property name="do unwrap">True</property>
+    <property name="unwrapper name">snaphu_mcf</property>
+    <property name="geocode bounding box">[34.84, 35.29, 107.80, 108.37]</property>
+  </component>
+</topsApp>
+<!--#################################################################################################################################################-->
+
+<!--
+#########################################################配置文件中的所有参数，若未设置则保持默认#########################################################
+name                        type       mandatory  doc                           
+=========================== ========== ========== ==============================
+ampcormargin                int        False      Ampcor margin offset. Used in 
+                                                  runDenseOffsets.              
+ampcoroversamplingfactor    int        False      Ampcor oversampling factor.   
+                                                  Used in runDenseOffsets.      
+ampcorsearchwindowheight    int        False      Ampcor search window size     
+                                                  height. Used in               
+                                                  runDenseOffsets.              
+ampcorsearchwindowwidth     int        False      Ampcor search window size     
+                                                  width. Used in                
+                                                  runDenseOffsets.              
+ampcorskipheight            int        False      Ampcor skip down height. Used 
+                                                  in runDenseOffsets.           
+ampcorskipwidth             int        False      Ampcor skip across width. Used
+                                                  in runDenseOffsets.           
+ampcorwindowheight          int        False      Ampcor main window size       
+                                                  height. Used in               
+                                                  runDenseOffsets.              
+ampcorwindowwidth           int        False      Ampcor main window size width.
+                                                  Used in runDenseOffsets.      
+applyionospherecorrection   bool       False      N/A                           
+applypolynomialfitbeforefil bool       False      N/A                           
+teringionospherephase                                                           
+areasmaskedoutinionospheric int        False      areas masked out in           
+phaseestimation                                   ionospheric phase estimation  
+azimuthlooks                int        False      N/A                           
+azimuthshift                int        False      Ampcor gross offset down. Used
+                                                  in runDenseOffsets.           
+considerburstpropertiesinio bool       False      N/A                           
+nospherecomputation                                                             
+correctphaseerrorcausedbyio int        False      N/A                           
+nosphereazimuthshift                                                            
+demfilename                 str        False      Filename of the Digital       
+                                                  Elevation Model (DEM)         
+demstitcher                 component  False      Object that based on the frame
+                                                  bounding boxes creates a DEM  
+dodenseoffsets              bool       False      Perform dense offset          
+                                                  estimation                    
+doesd                       bool       False      Perform ESD estimation        
+dointerferogram             bool       False      Perform interferometry. Set to
+                                                  false to skip insar steps.    
+doionospherecorrection      bool       False      N/A                           
+dounwrap                    bool       False      True if unwrapping is desired.
+                                                  To be unsed in combination    
+                                                  with UNWRAPPER_NAME.          
+dounwrap2stage              bool       False      True if unwrapping is desired.
+                                                  To be unsed in combination    
+                                                  with UNWRAPPER_NAME.          
+endionospherestep           str        False      N/A                           
+esdazimuthlooks             int        False      Number of azimuth looks for   
+                                                  overlap IFGs                  
+esdcoherencethreshold       float      False      ESD coherence threshold       
+esdrangelooks               int        False      Number of range looks for     
+                                                  overlap IFGs                  
+extraesdcycles              float      False      Extra ESD cycles to interpret 
+                                                  overlap phase                 
+family                      str        False      Instance family name          
+filternullfactor            float      False      NULL factor to use in         
+                                                  filtering offset fields to    
+                                                  avoid numpy type issues.      
+filterstrength              float      False      N/A                           
+filterwindowsize            int        False      Window size for median_filter.
+geocodeboundingbox          float      False      Bounding box for geocoding -  
+                                                  South, North, West, East in   
+                                                  degrees                       
+geocodedemfilename          str        False      Filename of the DEM for       
+                                                  geocoding                     
+geocodelist                 str        False      List of products to geocode.  
+heightofionospherelayerinkm float      False      N/A                           
+maximumwindowsizeforfilteri int        False      N/A                           
+ngionosphereazimuthshift                                                        
+maximumwindowsizeforfilteri int        False      N/A                           
+ngionospherephase                                                               
+minimumwindowsizeforfilteri int        False      N/A                           
+ngionosphereazimuthshift                                                        
+minimumwindowsizeforfilteri int        False      N/A                           
+ngionospherephase                                                               
+name                        str        False      Instance name                 
+numberofazimuthlooksatfirst int        False      N/A                           
+stageforionospherephaseunwr                                                     
+apping                                                                          
+numberofrangelooksatfirstst int        False      N/A                           
+ageforionospherephaseunwrap                                                     
+ping                                                                            
+offsetgeocodelist           str        False      List of offset-specific files 
+                                                  to geocode.                   
+offsetsnrthreshold          float      False      Offset SNR threshold          
+pickledumpdirectory         str        False      If steps is used, the         
+                                                  directory in which to store   
+                                                  pickle objects.               
+pickleloaddirectory         str        False      If steps is used, the         
+                                                  directory from which to       
+                                                  retrieve pickle objects.      
+rangelooks                  int        False      N/A                           
+rangeshift                  int        False      Ampcor gross offset across.   
+                                                  Used in runDenseOffsets.      
+reference                   component  True       Reference raw data component  
+regionofinterest            float      False      User defined area to crop in  
+                                                  SNWE                          
+renderer                    str        True       Format in which the data is   
+                                                  serialized when using steps.  
+                                                  Options are xml (default) or  
+                                                  pickle.                       
+rununwrapper                component  False      Unwrapping module             
+rununwrapper2stage          component  False      Unwrapping module             
+secondary                   component  True       Secondary raw data component  
+sensorname                  str        True       Sensor name                   
+snrthresholdfactor          float      False      SNR Threshold factor used in  
+                                                  filtering offset field        
+                                                  objects.                      
+solver_2stage               str        False      Linear Programming Solver for 
+                                                  2Stage; Options: pulp, gurobi,
+                                                  glpk; Used only for Redundant 
+                                                  Arcs                          
+startionospherestep         str        False      N/A                           
+swaths                      int        False      Swaths to process             
+topsproc                    component  False      TopsProc object               
+totalnumberofazimuthlooksin int        False      N/A                           
+theionosphereprocessing                                                         
+totalnumberofrangelooksinth int        False      N/A                           
+eionosphereprocessing                                                           
+unwrapper2stagename         str        False      2 Stage Unwrapping method to  
+                                                  use. Available: MCF, REDARC0, 
+                                                  REDARC1, REDARC2              
+unwrappername               str        False      Unwrapping method to use. To  
+                                                  be used in combination with   
+                                                  UNWRAP.                       
+usegpu                      bool       False      Allow App to use GPU when     
+                                                  available                     
+usehighresolutiondemonly    int        False      If True and a dem is not      
+                                                  specified in input, it will   
+                                                  only download the SRTM highest
+                                                  resolution dem if it is       
+                                                  available and fill the missing
+                                                  portion with null values      
+                                                  (typically -32767).           
+usevirtualfiles             bool       False      Use virtual files when        
+                                                  possible to save space        
+=========================== ========== ========== ==============================
+#########################################################################################################################################################
+-->
+
+<!--
+#######################################################topsApp.py用法，具体可运行topsApp.py -h查看#######################################################
+Command line options for steps processing are formed by
+combining the following three options as required:
+
+'--start=<step>', '--end=<step>', '--dostep=<step>'
+
+The step names are chosen from the following list:
+
+['startup', 'preprocess', 'computeBaselines', 'verifyDEM', 'topo']
+['subsetoverlaps', 'coarseoffsets', 'coarseresamp', 'overlapifg', 'prepesd']
+['esd', 'rangecoreg', 'fineoffsets', 'fineresamp', 'ion']
+['burstifg', 'mergebursts', 'filter', 'unwrap', 'unwrap2stage']
+['geocode', 'denseoffsets', 'filteroffsets', 'geocodeoffsets']
+
+If --start is missing, then processing starts at the first step.
+If --end is missing, then processing ends at the final step.
+If --dostep is used, then only the named step is processed.
+
+In order to use either --start or --dostep, it is necessary that a
+previous run was done using one of the steps options to process at least
+through the step immediately preceding the starting step of the current run.
+## 一般来说，直接topsApp.py Config.xml即可（使用时将Config替换成实际文件名）
+#########################################################################################################################################################
+-->
+
+<!--################################https://github.com/isce-framework/isce2/blob/main/examples/input_files/topsApp.xml################################-->
+<?xml version="1.0" encoding="UTF-8"?>
+<topsApp>
+  <component name="topsinsar">
+    <property name="Sensor name">SENTINEL1</property>
+    <component name="reference">
+      <catalog>reference.xml</catalog>
+    </component>
+    <component name="secondary">
+      <catalog>secondary.xml</catalog>
+    </component>
+  </component>
+</topsApp>
+<!--
+通用说明：使用语法高亮能让XML文件更易读。
+-->
+<!-- 这是一个XML注释 -->
+<!-- XML注释以本行开头的4个字符开始，以本行末尾的3个字符结束。 -->
+<!-- 此文件的其余部分仅包含注释。 -->
+<!--
+    XML文件的结构是：内容出现在由符号‘< >’指示的标签及其匹配的闭合标签‘</ >’之间。
+    在本文件顶部的11行中，使用了4种不同类型的标签：
+
+  (1) 标签 <topsApp> 及其闭合标签 </topsApp> 是必需的，但标签名称是任意的。
+
+  (2) <property> </property> 标签用于简单的属性。
+      这些标签包含一个‘name’属性（上例中的‘sensor name’）以及出现在开始和结束标签之间的一个值。
+
+  (3) <component> </component> 标签用于属于该组件（由标签的‘name’属性指示）的属性集合。
+
+  (4) <catalog> </catalog> 标签没有‘name’属性，其开始和结束标签之间给出的值是另一个包含该组件属性的XML文件的名称。
+
+下方示例中展示了可能用到的其他类型的标签。
+-->
+<!--
+    本文件顶部的11行给出了运行 insarApp.py 所需的最简输入文件，但大部分的输入信息包含在两个
+    夹在 <catalog> 标签和 </catalog> 标签之间的XML文件 reference.xml 和 secondary.xml 中。
+    对于不同的传感器，reference.xml 和 secondary.xml 文件的结构不同，但对于给定的传感器，它们彼此的结构是相同的。
+    本目录中提供了每种传感器类型的 reference.xml 示例文件，名称类似于 reference_tops_sentinel1a.xml。
+    您可以使用这些文件作为模板来创建自己的 reference.xml 和 secondary.xml 文件。
+    您也可以像下面这个ALOS的例子那样，将这些文件的内容直接内联写入 insarApp.xml 文件：
+-->
+<!--
+<topsApp>
+  <component name="topsinsar">
+    <component name="reference">
+      <property name="orbit directory">/Users/agram/orbit/S1A/precise</property>
+      <property name="auxiliary data directory">/Users/agram/orbit/S1A/aux</property>
+      <property name="output directory">reference</property>
+      <property name="swath number">2</property>
+      <property name="safe">../data/S1A_IW_SLC__1SSV_20150119T135944_20150119T140004_004241_005286_4271.SAFE</property>
+    </component>
+    <component name="secondary">
+      <property name="orbit directory">/Users/agram/orbit/S1A/precise</property>
+      <property name="auxiliary data directory">/Users/agram/orbit/S1A/aux</property>
+      <property name="region of interest">[35.4, 35.6, -119.6, -119.4]</property>
+      <property name="output directory">secondary</property>
+      <property name="swath number">2</property>
+      <property name="safe">../data/S1A_IW_SLC__1SSV_20150212T135943_20150212T140003_004591_005A67_5DEC.SAFE</property>
+    </component>
+  </component>
+</topsApp>
+-->
+<!-- <<topsApp.py 的输入>>
+     本文件提供了一个基本的模板，用于设置 topsApp.py 的干涉图输入文件。此处仅描述了常用的选项。
+
+     有三种方式可以为 topsApp.py 提供基本输入。选择其中任何一种即可。我们推荐方法1。
+
+     方法 1：使用 topsApp.xml [利用内置的可配置性]
+        >topsApp.py
+            - 自动查找 topsApp.xml 并加载 ISCE 应用程序实例配置。
+
+     方法 2：使用 topsinsar.xml [利用内置的可配置性]
+        > topsApp.py
+            - 自动查找 topsinsar.xml 并加载 ISCE 应用程序家族配置。
+            - “topsApp” 是 “topsinsar” 家族的一个特定实例。topsApp.py 首先读取 topsinsar.xml 来配置对象，然后读取 topsApp.xml。
+              如果两个文件中存在重复的值，topsApp.xml 中的值将优先于 topsinsar.xml。
+
+     方法 3：使用与下面结构相同的任意 XML 文件。
+        > topsApp.py input.xml [明确强制使用特定的 XML 文件]
+            - topsApp.py 检查 topsinsar.xml 并在可用时加载信息。
+            - topsApp.py 然后检查 topsApp.xml 并在可用时更新/创建配置。
+            - topsApp.py 最后读取 “input.xml” 并更新/创建配置。
+-->
+<!-- <<ISCE XML 属性格式>>
+     ISCE XML 文件支持两种类型的属性定义。
+
+    格式 1：
+            <property name="Sensor name">SENTINEL1</property>
+
+    格式 2：
+             <property name="Sensor name">
+                <value>SENTINEL1</value>
+             </property>
+-->
+<!--
+
+<topsApp>  这个标签名称并不重要。
+    <component name="topsinsar">   这个组件必须命名为 topsinsar。
+
+        必填项：
+
+        使用 "topsApp.py -h" 可以获取完整的传感器列表。
+        <property  name="Sensor name">SENTINEL1</property>
+
+        参考和次影像的信息通过目录（catalogs）提供。
+        这些目录文件的结构因传感器而异。
+        请参阅 "reference_TOPS_SENSOR.xml" 文件以了解不同传感器的示例。
+        <component name="reference">
+            <catalog>reference.xml</catalog> 从 reference.xml 获取信息
+        </component>
+        <component name="secondary">
+            <catalog>secondary.xml</catalog>  从 secondary.xml 获取信息
+        </component>
+
+-->
+<!-- 可选项。
+             用户无需定义这些。
+             如果不提供，将使用默认值。
+             如果想使用这些，请取消注释 <property> 标签。-->
+<!-- << 数字高程模型 (DEM) >>
+             如果不提供，将自动下载 SRTM DEM。
+             请参阅 examples 目录中的 "dem_latest.xml" 示例。-->
+<!--
+        <property name="demFilename">dem_latest.dem</property> 从 dem_latest.dem.xml 获取信息
+-->
+<!--<property name="range looks">2</property>-->
+<!--<property name="azimuth looks">4</property>-->
+<!--子集化处理的数据量。
+要选择性地仅处理某些条带，请添加以下标签。注意，即使是单个条带，也要以列表形式提供。
+此条目将覆盖 reference.xml 和 secondary.xml 中的条带编号条目。如果不包含，将处理所有条带。 
+<property name="swaths">[1,2]</property>
+
+要选择性地处理一个区域，请以 SNWE 惯例（纬度/经度）提供边界框。
+这将再次覆盖 reference.xml 和 secondary.xml 中的任何感兴趣区域。如果感兴趣的区域覆盖的条带较少，则只处理那些条带。
+<property name="region of interest">[32.5, 33,130.4, 132.5]</property>
+-->
+<!-- 禁用增强型谱分集 (ESD) 方位向偏移量精化
+默认情况下，始终执行 ESD。
+<property name="do ESD">False</property> -->
+<!-- <<滤波强度>>
+             Goldstein 滤波长度-->
+<!--<property name="filter strength">0.4</property>-->
+<!-- <<相位解缠>>
+             可以选择关闭相位解缠。
+             当前可用的解缠器有：
+             grass, icu, snaphu, snaphu_mcf, downsample_snaphu-->
+<!--<property name="do unwrap">True</property>-->
+<!--<property name="unwrapper name">snaphu_mcf</property>-->
+<!-- 两阶段解缠选项需要以下标签：-->
+<!--<property name="do unwrap">True</property> -->
+<!--<property name="unwrapper name">snaphu_mcf</property> -->
+<!--<property name="do unwrap 2 stage">True</property> -->
+<!--<property name="unwrapper 2 stage name">MCF</property> -->
+<!-- <<地理编码>> -->
+<!-- 使用 ISCE 创建地理编码的配准堆栈很容易。
+             您可以按照以下 SNWE 格式指定精确的地理编码边界框。
+             只要使用相同的 DEM 和边界框，所有产品都将被地理编码到相同的网格上。-->
+<!--<property name="geocode bounding box">[19.1, 19.45, -155.45, -154.7]</property>-->
+<!-- 默认情况下，ISCE 会地理编码一长串产品列表。一旦您熟悉了
+             产品名称，您可以强制 ISCE 仅地理编码您感兴趣的产品。
+             对于名为 "abc.def" 的文件，其地理编码参数可以通过 insarapp_geocode_abcdef.xml 控制。-->
+<!--<property name="geocode list">['filt_topophase.flat', 'los.rdr', 'topophase.cor', 'phsig.cor']</property>-->
+<!--
+    </component>
+</topsApp>
+-->
+<!--
+#####################################################################
+#电离层校正模块参数
+#下面的值是模块使用的默认值
+<property name="do ionosphere correction">False</property>
+<property name="apply ionosphere correction">False</property>
+<property name="consider burst properties in ionosphere computation">False</property>
+#可选值： ['subband', 'rawion', 'grd2ion', 'filt_gaussian', 'ionosphere_shift', 'ion2grd', 'esd']
+<property name="start ionosphere step">subband</property>
+<property name="end ionosphere step">esd</property>
+
+<property name="height of ionosphere layer in km">200.0</property>
+<property name="apply polynomial fit before filtering ionosphere phase">True</property>
+<property name="maximum window size for filtering ionosphere phase">200</property>
+<property name="minimum window size for filtering ionosphere phase">100</property>
+<property name="maximum window size for filtering ionosphere azimuth shift">150</property>
+<property name="minimum window size for filtering ionosphere azimuth shift">75</property>
+#0：不校正
+#1：使用一个条带的平均值
+#2：使用完整的条带
+<property name="correct phase error caused by ionosphere azimuth shift">1</property>
+
+#分离的岛屿或区域通常会影响电离层估计，最好将它们屏蔽掉。
+#检查 ion/ion_cal/raw_no_projection.ion 文件以确定需要屏蔽的区域。
+#该参数是一个二维列表。二维列表中的每个元素都是一个四元素列表：[第一行,
+#最后一行，第一列，最后一列]，行/列编号从1开始。如果四
+#个元素之一被指定为 -1，程序将使用第一行/最后一行/第一列/最后一行代替。例如，
+#如果想屏蔽以下两个区域，您可以指定一个二维列表，例如：
+#[[100, 200, 100, 200],[1000, 1200, 500, 600]]
+<property name="areas masked out in ionospheric phase estimation">None</property>
+
+#最好不要尝试更改以下两个参数，因为它们与上述滤波参数相关
+<property name="total number of azimuth looks in the ionosphere processing">50</property>
+<property name="total number of range looks in the ionosphere processing">200</property>
+#上面的数字应该是下面数字的整数倍
+<property name="number of azimuth looks at first stage for ionosphere phase unwrapping">10</property>
+<property name="number of range looks at first stage for ionosphere phase unwrapping">40</property>
+#########################################################################################################################################################
+-->
